@@ -16,8 +16,8 @@ $requestMethod = "GET";
 /* Use geocode : latitude and longitude
    test case : 13.736717,100.523186,100km (bangkok)
 */
-if (isset($_GET['geocode']))  {$geocode = $_GET['geocode'];}  else {$geocode  = "13.736717,100.523186,100km";}
-if (isset($_GET['count'])) {$count = $_GET['count'];} else {$count = 20;}
+if (isset($_GET['geocode']))  {$geocode = $_GET['geocode'];}  else {$geocode  = "13.736717,100.523186,50km";}
+if (isset($_GET['count'])) {$count = $_GET['count'];} else {$count = 100;}
 $getfield = "?geocode=$geocode&count=$count";
 
 $twitter = new TwitterAPIExchange($settings);
@@ -32,11 +32,15 @@ if($string["errors"][0]["message"] != ""){
 
 // GET:"statuses" 
 foreach($string['statuses'] as $items){
-	echo"================================================================="."<br />";
-	echo '<img src="'.$items['user']['profile_image_url'].'" alt="error">'."<br />";
-    echo "Time and Date of Tweet: ".$items['created_at']."<br />";
-    echo "Tweet: ". $items['text']."<br />";
-    echo "Tweeted by: ". $items['user']['name']."<br />";
-	echo "Coordinates: ".$items['coordinates']."<br />";
+	if($items['coordinates'] != ""){	// only the tweets has contain coordinate data
+		echo"================================================================="."<br />";
+		echo '<img src="'.$items['user']['profile_image_url'].'" alt="error">'."<br />";
+		echo "Time and Date of Tweet: ".$items['created_at']."<br />";
+		echo "Tweet: ". $items['text']."<br />";
+		echo "Tweeted by: ". $items['user']['name']."<br />";	
+		foreach($items['coordinates'] as $v){
+			echo "Coordinates: ".$v[0].", ".$v[1]."<br />";
+		}
+	}
 }
 ?>
