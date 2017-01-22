@@ -1,8 +1,7 @@
 <?php
-echo "<h2>Simple Twitter API Test</h2>";
-
+echo "<h2>Search Twitter API Test</h2>";
 require_once('TwitterAPIExchange.php');
- 
+
 /** Set access tokens here - see: https://dev.twitter.com/apps/ **/
 $settings = array(
     'oauth_access_token' => "823122555712045056-7W6lHDxVAh0UCCMecGrsPNtKdRqMita",
@@ -11,24 +10,33 @@ $settings = array(
     'consumer_secret' => "wEbwO4xZOqj0QW1tg582slJ89Tvh2rxZWTqDiisiLVBkAOuHxF"
 );
 
-$url = "https://api.twitter.com/1.1/statuses/user_timeline.json";
+$url = "https://api.twitter.com/1.1/search/tweets.json";
 $requestMethod = "GET";
-if (isset($_GET['user']))  {$user = $_GET['user'];}  else {$user  = "iagdotme";}
+
+/* Use geocode : latitude and longitude
+   test case : 13.736717,100.523186,100km (bangkok)
+*/
+if (isset($_GET['geocode']))  {$geocode = $_GET['geocode'];}  else {$geocode  = "13.736717,100.523186,100km";}
 if (isset($_GET['count'])) {$count = $_GET['count'];} else {$count = 20;}
-$getfield = "?screen_name=$user&count=$count";
+$getfield = "?geocode=$geocode&count=$count";
+
 $twitter = new TwitterAPIExchange($settings);
 $string = json_decode($twitter->setGetfield($getfield)
-->buildOauth($url, $requestMethod)
-->performRequest(),$assoc = TRUE);
-if($string["errors"][0]["message"] != "") {echo "<h3>Sorry, there was a problem.</h3><p>Twitter returned the following error message:</p><p><em>".$string[errors][0]["message"]."</em></p>";exit();}
-foreach($string as $items)
-    {
-        echo "Time and Date of Tweet: ".$items['created_at']."<br />";
-        echo "Tweet: ". $items['text']."<br />";
-        echo "Tweeted by: ". $items['user']['name']."<br />";
-        echo "Screen name: ". $items['user']['screen_name']."<br />";
-        echo "Followers: ". $items['user']['followers_count']."<br />";
-        echo "Friends: ". $items['user']['friends_count']."<br />";
-        echo "Listed: ". $items['user']['listed_count']."<br /><hr />";
-    }
+	->buildOauth($url, $requestMethod)
+	->performRequest(),$assoc = TRUE);
+if($string["errors"][0]["message"] != ""){
+	echo "<h3>Sorry, there was a problem.</h3><p>Twitter returned the following error message:</p><p><em>"
+		.$string[errors][0]["message"]."</em></p>";
+	exit();
+}
+
+// GET:"statuses" 
+foreach($string['statuses'] as $items){
+	echo"================================================================="."<br />";
+	echo '<img src="'.$items['user']['profile_image_url'].'" alt="error">'."<br />";
+    echo "Time and Date of Tweet: ".$items['created_at']."<br />";
+    echo "Tweet: ". $items['text']."<br />";
+    echo "Tweeted by: ". $items['user']['name']."<br />";
+	echo "Coordinates: ".$items['coordinates']."<br />";
+}
 ?>
