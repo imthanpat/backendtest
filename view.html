@@ -53,9 +53,6 @@
       .pac-controls {
         display: inline-block;
         padding: 5px 11px;
-		position:fixed;
-		left:0px;
-		bottom:0px;
       }
 
       .pac-controls label {
@@ -92,8 +89,8 @@
     </style>
   </head>
   <body>
+    <input id="pac-input" class="controls" type="text" placeholder="City Name">
     <div id="map"></div>
-	<input id="pac-input" class="controls" type="text" placeholder="Search Box">
     <script>
       // This example adds a search box to a map, using the Google Place Autocomplete
       // feature. People can enter geographical searches. The search box will return a
@@ -105,7 +102,7 @@
 
       function initAutocomplete() {
         var map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: -33.8688, lng: 151.2195},
+          center: {lat: 13.736717, lng: 100.523186},
           zoom: 13,
           mapTypeId: 'roadmap'
         });
