@@ -11,3 +11,6 @@ https://iag.me/socialmedia/build-your-first-twitter-app-using-php-in-8-easy-step
 http://thoughtfaucet.com/search-twitter-by-location/examples/
 http://stackoverflow.com/questions/4337319/twitter-api-how-to-search-only-for-geotagged-tweets
 https://dev.twitter.com/rest/reference/get/search/tweets
+
+# google marker
+https://developers.google.com/maps/documentation/javascript/examples/marker-remove
