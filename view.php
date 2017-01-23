@@ -1,5 +1,4 @@
 <?php
-echo "<h2>Search Twitter API Test</h2>";
 require_once('TwitterAPIExchange.php');
 
 /** Set access tokens here - see: https://dev.twitter.com/apps/ **/
@@ -14,9 +13,9 @@ $url = "https://api.twitter.com/1.1/search/tweets.json";
 $requestMethod = "GET";
 
 /* Use geocode : latitude and longitude
-   test case : 13.736717,100.523186,100km (bangkok)
+   test case : 13.736717,100.523186,150km (bangkok)
 */
-if (isset($_GET['geocode']))  {$geocode = $_GET['geocode'];}  else {$geocode  = "13.736717,100.523186,50km";}
+if (isset($_GET['geocode']))  {$geocode = $_GET['geocode'];}  else {$geocode  = "13.736717,100.523186,150km";}
 if (isset($_GET['count'])) {$count = $_GET['count'];} else {$count = 100;}
 $getfield = "?geocode=$geocode&count=$count";
 
@@ -29,18 +28,27 @@ if($string["errors"][0]["message"] != ""){
 		.$string[errors][0]["message"]."</em></p>";
 	exit();
 }
-
-// GET:"statuses" 
-foreach($string['statuses'] as $items){
+ 
+$output = "<root>";
+$count = 0;
+foreach($string['statuses'] as $items){	// GET:"statuses"
 	if($items['coordinates'] != ""){	// only the tweets has contain coordinate data
-		echo"================================================================="."<br />";
-		echo '<img src="'.$items['user']['profile_image_url'].'" alt="error">'."<br />";
-		echo "Time and Date of Tweet: ".$items['created_at']."<br />";
-		echo "Tweet: ". $items['text']."<br />";
-		echo "Tweeted by: ". $items['user']['name']."<br />";	
+		$output .= "<data".$count.">"
+					."<img>".$items['user']['profile_image_url']."</img>"
+					."<date>".$items['created_at']."</date>"
+					."<tweet>".$items['text']."</tweet>"
+					."<user>".$items['user']['name']."</user>";
 		foreach($items['coordinates'] as $v){
-			echo "Coordinates: ".$v[0].", ".$v[1]."<br />";
+			if(!is_numeric($v[0])) { continue; }
+			$output .= "<coordinates>".$v[0].",".$v[1]."</coordinates>";
 		}
+		$output .= "</data".$count.">";
+		$count++;
 	}
 }
+$output .= "</root>";
+
+$xml = simplexml_load_string($output);
+$json = json_encode($xml);
+echo $json;
 ?>

@@ -89,9 +89,11 @@
     </style>
   </head>
   <body>
-    <input id="pac-input" class="controls" type="text" placeholder="City Name">
-    <div id="map"></div>
+	<input id="pac-input" class="controls" type="text" placeholder="City Name">
+	<div id="map"></div>
     <script>
+		//<input id="pac-input" class="controls" type="text" placeholder="City Name">
+		//<div id="map"></div>
       // This example adds a search box to a map, using the Google Place Autocomplete
       // feature. People can enter geographical searches. The search box will return a
       // pick list containing a mix of places and predicted search terms.
@@ -111,12 +113,13 @@
         var input = document.getElementById('pac-input');
         var searchBox = new google.maps.places.SearchBox(input);
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-
+		
+		/*
         // Bias the SearchBox results towards current map's viewport.
         map.addListener('bounds_changed', function() {
           searchBox.setBounds(map.getBounds());
         });
-
+		*/
         var markers = [];
         // Listen for the event fired when the user selects a prediction and retrieve
         // more details for that place.
@@ -166,7 +169,6 @@
           map.fitBounds(bounds);
         });
       }
-
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBisBePARYKU-U7TbR5FlUZNMRlJkoqJiI&libraries=places&callback=initAutocomplete"
          async defer></script>
