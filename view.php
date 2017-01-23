@@ -13,10 +13,18 @@ $url = "https://api.twitter.com/1.1/search/tweets.json";
 $requestMethod = "GET";
 
 /* Use geocode : latitude and longitude
-   test case : 13.736717,100.523186,150km (bangkok)
+   test case : 13.736717,100.523186,50km (bangkok)
 */
-if (isset($_GET['geocode']))  {$geocode = $_GET['geocode'];}  else {$geocode  = "13.736717,100.523186,150km";}
-if (isset($_GET['count'])) {$count = $_GET['count'];} else {$count = 100;}
+if(isset($_GET['geocode'])){
+	$geocode = $_GET['geocode'].",50km";
+}else{
+	$geocode  = "13.736717,100.523186,50km";	// defult Bangkok
+}
+if(isset($_GET['count'])){
+	$count = $_GET['count'];
+}else{
+	$count = 100;
+}
 $getfield = "?geocode=$geocode&count=$count";
 
 $twitter = new TwitterAPIExchange($settings);
@@ -40,7 +48,8 @@ foreach($string['statuses'] as $items){	// GET:"statuses"
 					."<user>".$items['user']['name']."</user>";
 		foreach($items['coordinates'] as $v){
 			if(!is_numeric($v[0])) { continue; }
-			$output .= "<coordinates>".$v[0].",".$v[1]."</coordinates>";
+			$output .= "<lat>".$v[1]."</lat>";
+			$output .= "<lng>".$v[0]."</lng>";
 		}
 		$output .= "</data".$count.">";
 		$count++;

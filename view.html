@@ -92,16 +92,10 @@
 	<input id="pac-input" class="controls" type="text" placeholder="City Name">
 	<div id="map"></div>
     <script>
-      // This example adds a search box to a map, using the Google Place Autocomplete
-      // feature. People can enter geographical searches. The search box will return a
-      // pick list containing a mix of places and predicted search terms.
-
-      // This example requires the Places library. Include the libraries=places
-      // parameter when you first load the API. For example:
-      // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
 	  var map;
       var markers = [];
 	  
+	  // Funtion : get Json
 	  var getJSON = function(url, callback) {
 			var xhr = new XMLHttpRequest();
 			xhr.open("get", url, true);
@@ -117,49 +111,47 @@
 		xhr.send();
 	  };
 	  
-	  // Adds a marker to the map and push to the array.
-      function addMarker(lat, lng) {
+	  // Adds a marker to the map and add TweetInfowindow.
+      function addMarker(lat, lng, userImg, tweet) {
 		var markerLocation = new google.maps.LatLng(lat, lng);
         var marker = new google.maps.Marker({
           position: markerLocation,
-          map: map
+          map: map,
+		  icon: userImg
         });
-        markers.push(marker);
+        markers.push(marker);		// push marker to array
+		attachTweet(marker, tweet);
       }
 	  
-	  function sleep(milliseconds){
-	    var start = new Date().getTime();
-	    for (var i = 0; i < 1e7; i++) {
-		  if ((new Date().getTime() - start) > milliseconds){
-			break;
-		  }
-	    }
-	  }
+	  // Attaches an info window to a marker with the Tweet message.
+      function attachTweet(marker, tweetInfo) {
+        var infowindow = new google.maps.InfoWindow({
+          content: tweetInfo
+        });
+
+        marker.addListener('click', function() {
+          infowindow.open(marker.get('map'), marker);
+        });
+      }
 	  
       function initAutocomplete() {
         map = new google.maps.Map(document.getElementById('map'), {
+		  // lat: 13.736717, lng: 100.523186 is Bangkok init
           center: {lat: 13.736717, lng: 100.523186},
-          zoom: 4,
+          zoom: 10,
           mapTypeId: 'roadmap'
         });
 
         // Create the search box and link it to the UI element.
         var input = document.getElementById('pac-input');
         var searchBox = new google.maps.places.SearchBox(input);
-        map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(input);
+        map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
 		
 		
-        // Bias the SearchBox results towards current map's viewport.
-        map.addListener('bounds_changed', function() {
-          searchBox.setBounds(map.getBounds());
-        });
-		
-        
         // Listen for the event fired when the user selects a prediction and retrieve
         // more details for that place.
         searchBox.addListener('places_changed', function() {
           var places = searchBox.getPlaces();
-
           if (places.length == 0) {
             return;
           }
@@ -177,38 +169,33 @@
               console.log("Returned place contains no geometry");
               return;
             }
-            var icon = {
-              url: place.icon,
-              size: new google.maps.Size(71, 71),
-              origin: new google.maps.Point(0, 0),
-              anchor: new google.maps.Point(17, 34),
-              scaledSize: new google.maps.Size(25, 25)
-            };
 			
 			// GET : TweetInfo
 			var latitude = place.geometry.location.lat();
 			var longitude = place.geometry.location.lng();
-			var tweetInfo;
-			getJSON("http://localhost/test/vvvv.php?geocode="+latitude+","+longitude,
+			getJSON("http://localhost/test/vvvv.php?geocode=" + latitude + "," + longitude,
 			function(err, data) {
 			  if(err != null) {
 				alert("Something went wrong: " + err);
 			  }else{
 				var count = Object.keys(data).length;
-				console.log(count);
-				if(count != null){				
+				//console.log(count);
+				if(count != 0){				
 					for (var $items in data) {
+						// Prepare TweetInfo:
 						var thisLat = data[$items]['lat'] - 0;
 						var thisLng = data[$items]['lng'] - 0;
+						var thisImg = data[$items]['img'];
+						var message = "Tweet: " + data[$items]['tweet'] + "<br>User: " 
+									+ data[$items]['user'] + "<br>Date: " + data[$items]['date'];
 						
 						// add Marker
-						addMarker(thisLat, thisLng);
+						addMarker(thisLat, thisLng, thisImg, message);
 					}
 						
-				}else{ alert("Please Try Again!"); }
+				}else{ alert("Please Try Again! : Not Found Tweet"); }
 			  }
 			});
-			
 			
             if (place.geometry.viewport) {
               // Only geocodes have viewport.
@@ -216,7 +203,6 @@
             } else {
               bounds.extend(place.geometry.location);
             }
-			
           });
           map.fitBounds(bounds);
         });
